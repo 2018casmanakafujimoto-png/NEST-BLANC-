@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    // Diagnosis content: public read (needed by the quiz/result pages),
+    // write restricted to admins (edited via /admin).
+    match /cms/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /stats/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /questions/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /cta/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /articles/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Anonymous users may write their own diagnosis result; only admins can
+    // read/manage the full result log.
+    match /diagnosisResults/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Admin membership itself: a user may check their own membership doc,
+    // but no client (including admins) can write it — manage via the
+    // Firebase console or Admin SDK only.
+    match /adminUsers/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}
