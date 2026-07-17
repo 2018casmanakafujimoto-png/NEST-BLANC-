@@ -60,10 +60,7 @@ function loadCmsCollection(): Promise<Map<string, unknown>> {
 }
 
 async function readDoc<T>(docId: string, fallback: T): Promise<T> {
-  const db = getFirestoreDb();
-  if (!db) return fallback;
-  const map = await loadCmsCollection();
-  return map.has(docId) ? (map.get(docId) as T) : fallback;
+ return fallback;
 }
 
 async function writeDoc<T extends object>(docId: string, value: T): Promise<void> {
