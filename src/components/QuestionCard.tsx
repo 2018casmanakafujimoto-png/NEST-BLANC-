@@ -26,7 +26,7 @@ export function QuestionCard({ question, onAnswer }: QuestionCardProps) {
           <button
             key={option.key}
             onClick={() => onAnswer(option.key)}
-            className="rounded-soft border border-nb-sub bg-white px-5 py-4 text-left text-sm transition hover:border-nb-accent hover:bg-nb-main"
+            className="rounded-soft border border-nb-sub bg-white px-5 py-4 text-left text-sm shadow-sm transition hover:border-nb-accent hover:bg-nb-main hover:shadow-md"
           >
             <span className="mr-2 text-nb-accent">{option.key}.</span>
             {option.text}

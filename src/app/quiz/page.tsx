@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,6 +8,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { QuestionCard } from "@/components/QuestionCard";
 import { questions } from "@/data/questions";
 import { Answer, QuestionOption } from "@/types/quiz";
+import { imageConfigDefault } from "next/dist/shared/lib/image-config";
 
 export default function QuizPage() {
   const router = useRouter();
@@ -17,7 +19,13 @@ export default function QuizPage() {
   const currentQuestion = questions[step];
 
   function handleAnswer(optionKey: QuestionOption["key"]) {
-    const nextAnswers = [...answers, { questionId: currentQuestion.id, optionKey }];
+    const existingIndex = answers.findIndex((a) => a.questionId === currentQuestion.id);
+    const nextAnswers =
+      existingIndex >= 0
+        ? answers.map((a, i) =>
+            i === existingIndex ? { questionId: currentQuestion.id, optionKey } : a
+          )
+        : [...answers, { questionId: currentQuestion.id, optionKey }];
     setAnswers(nextAnswers);
 
     if (step + 1 < questions.length) {
@@ -32,6 +40,11 @@ export default function QuizPage() {
     setTimeout(() => {
       router.push("/result");
     }, 3000);
+  }
+
+  function handleBack() {
+    if (step === 0) return;
+    setStep(step - 1);
   }
 
   if (isFinishing) {
@@ -50,8 +63,21 @@ export default function QuizPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-10 px-6 py-16">
       <ProgressBar current={step + 1} total={questions.length} />
+
+  
+
+      {step > 0 && (
+        <button
+          onClick={handleBack}
+          className="self-start text-sm text-nb-accent transition hover:opacity-70"
+        >
+          ← 戻る
+        </button>
+      )}
       <AnimatePresence mode="wait">
         <QuestionCard key={currentQuestion.id} question={currentQuestion} onAnswer={handleAnswer} />
+
+
       </AnimatePresence>
     </main>
   );

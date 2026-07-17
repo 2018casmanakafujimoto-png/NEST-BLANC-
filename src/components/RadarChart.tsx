@@ -2,9 +2,9 @@ import { AXES, AxisScores } from "@/types/quiz";
 
 const AXIS_LABELS: Record<(typeof AXES)[number], string> = {
   independence: "自立度",
-  communication: "コミュ力",
+  communication: "コミュニケーション",
   lifestyle: "ライフスタイル",
-  workFamily: "仕事×家庭",
+  workFamily: "仕事・家庭",
   distance: "距離感",
 };
 

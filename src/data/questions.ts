@@ -18,7 +18,7 @@ export const questions: Question[] = [
   {
     id: "q2",
     order: 2,
-    text: "恋人との連絡頻度は？",
+    text: "理想の連絡頻度は？",
     options: [
       { key: "A", text: "できれば毎日何度も", scores: { distance: 5, communication: 2 } },
       { key: "B", text: "毎日1〜2回", scores: { distance: 4, communication: 2 } },
@@ -207,21 +207,21 @@ export const questions: Question[] = [
     order: 19,
     text: "結婚生活で最も大切だと思うことは？",
     options: [
-      { key: "A", text: "信頼", scores: { communication: 5, workFamily: 2 } },
-      { key: "B", text: "会話", scores: { communication: 5 } },
-      { key: "C", text: "価値観", scores: { independence: 2, workFamily: 5 } },
-      { key: "D", text: "安心感", scores: { distance: 5, communication: 2 } },
+      { key: "A", text: "信頼", scores: { distance: 4, communication: 2 } },
+      { key: "B", text: "会話", scores: { communication: 5, distance: 2 } },
+      { key: "C", text: "価値観の一致", scores: { lifestyle: 4, workFamily: 2 } },
+      { key: "D", text: "お互いを尊重すること", scores: { independence: 3, communication: 3 } },
     ],
   },
   {
     id: "q20",
     order: 20,
-    text: "あなたが結婚相手を選ぶ時、一番重視することは？",
+    text: "二人で大きな決断をする時、あなたはどうしたいですか？",
     options: [
-      { key: "A", text: "誠実さ", scores: { communication: 5, workFamily: 2 } },
-      { key: "B", text: "価値観の一致", scores: { communication: 4, workFamily: 4 } },
-      { key: "C", text: "一緒にいて自然体でいられること", scores: { distance: 4, lifestyle: 4 } },
-      { key: "D", text: "将来の安心感", scores: { workFamily: 5, distance: 3 } },
+      { key: "A", text: "しっかり話し合って決めたい", scores: { communication: 5, workFamily: 2 } },
+      { key: "B", text: "お互いが納得できる方法を探したい", scores: { communication: 4, distance: 3 } },
+      { key: "C", text: "状況に応じて柔軟に決めたい", scores: { independence: 3, lifestyle: 3 } },
+      { key: "D", text: "得意な方がリードすればいい", scores: { independence: 4, workFamily: 2 } },
     ],
   },
 ];

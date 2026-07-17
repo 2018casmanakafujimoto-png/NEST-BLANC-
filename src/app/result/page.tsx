@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { RadarChart } from "@/components/RadarChart";
 import { HappinessScoreCard } from "@/components/HappinessScoreCard";
@@ -23,6 +24,10 @@ export default function ResultPage() {
   const [result, setResult] = useState<DiagnosisResult | null | undefined>(undefined);
   const [maleProfiles, setMaleProfiles] = useState<Record<MaleTypeId, MaleTypeProfile> | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const mountTimeRef = useRef<number | null>(null);
+  if (mountTimeRef.current === null && typeof performance !== "undefined") {
+    mountTimeRef.current = performance.now();
+  }
 
   useEffect(() => {
     // No answers saved (fresh visit, cleared storage, etc.): never call
@@ -32,8 +37,10 @@ export default function ResultPage() {
       setResult(null);
       return;
     }
+    console.time("[measure] ResultPage: data fetch (buildDiagnosisResult + getMaleTypeProfiles)");
     Promise.all([buildDiagnosisResult(answers), getMaleTypeProfiles()])
       .then(([diagnosisResult, profiles]) => {
+        console.timeEnd("[measure] ResultPage: data fetch (buildDiagnosisResult + getMaleTypeProfiles)");
         setResult(diagnosisResult);
         setMaleProfiles(profiles);
       })
@@ -42,6 +49,14 @@ export default function ResultPage() {
         setLoadError(true);
       });
   }, []);
+
+  useEffect(() => {
+    if (result && maleProfiles && mountTimeRef.current !== null) {
+      console.log(
+        `[measure] ResultPage: mount -> content rendered: ${(performance.now() - mountTimeRef.current).toFixed(1)}ms`
+      );
+    }
+  }, [result, maleProfiles]);
 
   if (loadError) {
     return (
@@ -81,7 +96,7 @@ export default function ResultPage() {
   const { profile, scores, topMatch, maleRanking, happiness, similarity, aiComment, marriageStats } = result;
 
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-16 px-6 py-16">
+    <main className="mx-auto flex max-w-md flex-col gap-20 px-6 py-20">
       {/* --- Section 1: type reveal --- */}
       <section className="flex min-h-[70vh] flex-col items-center justify-center gap-6 text-center">
         <p className="text-sm text-nb-accent">あなたの婚活タイプ</p>
@@ -89,14 +104,23 @@ export default function ResultPage() {
         <p className="text-sm leading-loose">{profile.headline}</p>
         <p className="text-sm leading-loose text-nb-text/80">{profile.description}</p>
         <p className="text-xs text-nb-text/50">
-          参考MBTI：{profile.mbtiReference.join(" / ")}
+          参考MBTI（あなたに近いタイプ）：{profile.mbtiReference.join(" / ")}
           <br />
           （MBTIは参考表示のみで、診断ロジックには使用していません）
-        </p>
+</p>
+ <Image
+    src="/images/result-1.png.png"
+    alt="診断結果"
+    width={300}
+    height={300}
+    className="rounded-2xl"
+ />
+
+  
       </section>
 
       {/* --- Section 2: radar chart --- */}
-      <section className="flex flex-col items-center gap-6 rounded-soft bg-nb-main p-6 text-center">
+      <section className="flex flex-col items-center gap-6 rounded-soft bg-nb-main p-8 text-center shadow-sm">
         <h2 className="text-lg font-medium">婚活価値観レーダーチャート</h2>
         <RadarChart series={[{ scores, color: "#C98D8D", label: "あなた" }]} />
         <dl className="grid w-full grid-cols-2 gap-2 text-left text-xs">
@@ -134,7 +158,7 @@ export default function ResultPage() {
       </section>
 
       {/* --- Section 4: ideal partner (from AI comment template) --- */}
-      <section className="flex flex-col items-center gap-4 rounded-soft bg-nb-main p-6 text-center">
+      <section className="flex flex-col items-center gap-4 rounded-soft bg-nb-main p-8 text-center shadow-sm">
         <h2 className="text-lg font-medium">あなたへの婚活アドバイス</h2>
         <div className="whitespace-pre-line text-left text-sm leading-loose">{aiComment}</div>
       </section>
@@ -142,11 +166,20 @@ export default function ResultPage() {
       {/* --- Section 6: 婚活幸福度 --- */}
       <section className="flex flex-col items-center gap-4 text-center">
         <h2 className="text-lg font-medium">婚活幸福度</h2>
+        <h3 className="text-sm leading-7 text-gray-600 whitespace-pre-line">
+{`婚活幸福度とは？
+
+あなたが幸せな結婚生活を送るための
+現在地を表したスコアです。
+
+点数が低いから悪いのではなく、
+「これから伸ばせるポイント」が分かります。`}
+</h3>
         <HappinessScoreCard happiness={happiness} />
       </section>
 
       {/* --- Section 7: NEST BLANC データとの比較 + 成婚女性類似度 --- */}
-      <section className="flex flex-col items-center gap-4 rounded-soft bg-nb-sub p-6 text-center">
+      <section className="flex flex-col items-center gap-4 rounded-soft bg-nb-sub p-8 text-center shadow-sm">
         <h2 className="text-lg font-medium">NEST BLANC 婚活データとの比較</h2>
         <p className="text-sm leading-loose">
           「{profile.name}」は全体の <span className="font-semibold text-nb-accent">{marriageStats.typeShare}%</span>
@@ -163,15 +196,28 @@ export default function ResultPage() {
         </p>
       </section>
 
-      <section className="flex flex-col items-center gap-4 rounded-soft bg-nb-sub p-8 text-center">
+      <section className="flex flex-col items-center gap-4 rounded-soft bg-nb-sub p-8 text-center shadow-sm">
+
+         <Image
+    src="/images/cta-1.png.png"
+    alt="診断結果"
+    width={300}
+    height={300}
+    className="rounded-2xl"
+ />
         <p className="leading-loose">
           あなたと相性が良い男性を
           <br />
           実際にご紹介できます。
         </p>
-        <button className="rounded-full bg-nb-accent px-8 py-4 text-white shadow-sm transition hover:opacity-90">
+        <a
+          href="https://nest-blanc.com/contact"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-full bg-nb-accent px-8 py-4 tracking-wide text-white shadow-md transition hover:opacity-90"
+        >
           無料カウンセリングを予約する
-        </button>
+        </a>
       </section>
     </main>
   );

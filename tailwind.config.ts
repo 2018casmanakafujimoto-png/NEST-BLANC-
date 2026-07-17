@@ -6,11 +6,11 @@ const config: Config = {
     extend: {
       colors: {
         nb: {
-          main: "#F7EDE8",
-          sub: "#EFD7D7",
-          accent: "#C98D8D",
-          text: "#444444",
-          bg: "#FFFDFB",
+          main: "#FBF1EC",
+          sub: "#F3DCE0",
+          accent: "#C58F93",
+          text: "#4A3F3F",
+          bg: "#FFFAF7",
         },
       },
       fontFamily: {

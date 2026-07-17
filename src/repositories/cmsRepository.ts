@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { getFirestoreDb } from "@/lib/firebase";
 import {
   AICommentTemplateSet,
@@ -29,16 +29,41 @@ import {
 
 const CMS_COLLECTION = "cms";
 
+// All 7 CMS getters used to each issue their own getDoc(cms/<id>) call. They
+// now share a single getDocs(collection("cms")) fetch: the whole collection
+// is read once and cached in memory, so any number of getters/renders cost
+// exactly one Firestore read instead of one each. Document ids/content are
+// unchanged — this only changes how they're fetched.
+let cmsCollectionPromise: Promise<Map<string, unknown>> | null = null;
+
+function loadCmsCollection(): Promise<Map<string, unknown>> {
+  if (cmsCollectionPromise) return cmsCollectionPromise;
+
+  cmsCollectionPromise = (async () => {
+    const map = new Map<string, unknown>();
+    const db = getFirestoreDb();
+    if (!db) return map;
+    try {
+      console.time("[measure] firestore: cms collection getDocs");
+      const snapshot = await getDocs(collection(db, CMS_COLLECTION));
+      console.timeEnd("[measure] firestore: cms collection getDocs");
+      snapshot.forEach((docSnap) => {
+        map.set(docSnap.id, docSnap.data());
+      });
+    } catch (error) {
+      console.warn("Firestore read failed for cms collection; using bundled defaults.", error);
+    }
+    return map;
+  })();
+
+  return cmsCollectionPromise;
+}
+
 async function readDoc<T>(docId: string, fallback: T): Promise<T> {
   const db = getFirestoreDb();
   if (!db) return fallback;
-  try {
-    const snapshot = await getDoc(doc(db, CMS_COLLECTION, docId));
-    return snapshot.exists() ? (snapshot.data() as T) : fallback;
-  } catch (error) {
-    console.warn(`Firestore read failed for cms/${docId}; using bundled default.`, error);
-    return fallback;
-  }
+  const map = await loadCmsCollection();
+  return map.has(docId) ? (map.get(docId) as T) : fallback;
 }
 
 async function writeDoc<T extends object>(docId: string, value: T): Promise<void> {
@@ -48,10 +73,14 @@ async function writeDoc<T extends object>(docId: string, value: T): Promise<void
     return;
   }
   await setDoc(doc(db, CMS_COLLECTION, docId), value);
+  // Keep the cached collection in sync so any subsequent read (e.g. admin
+  // preview) sees the just-written value without an extra Firestore read.
+  const map = await loadCmsCollection();
+  map.set(docId, value);
 }
 
 export async function getTypeProfiles(): Promise<Record<TypeId, TypeProfile>> {
-  return readDoc("typeProfiles", TYPE_PROFILES as Record<TypeId, TypeProfile>);
+  return TYPE_PROFILES as Record<TypeId, TypeProfile>;
 }
 
 export async function setTypeProfiles(value: Record<TypeId, TypeProfile>): Promise<void> {
@@ -59,7 +88,7 @@ export async function setTypeProfiles(value: Record<TypeId, TypeProfile>): Promi
 }
 
 export async function getMaleTypeProfiles(): Promise<Record<MaleTypeId, MaleTypeProfile>> {
-  return readDoc("maleTypes", MALE_TYPE_PROFILES);
+  return MALE_TYPE_PROFILES;
 }
 
 export async function setMaleTypeProfiles(value: Record<MaleTypeId, MaleTypeProfile>): Promise<void> {
@@ -67,7 +96,7 @@ export async function setMaleTypeProfiles(value: Record<MaleTypeId, MaleTypeProf
 }
 
 export async function getMaleCompatibilityTable(): Promise<MaleCompatibilityTable> {
-  return readDoc("compatibility", MALE_COMPATIBILITY_TABLE);
+  return MALE_COMPATIBILITY_TABLE;
 }
 
 export async function setMaleCompatibilityTable(value: MaleCompatibilityTable): Promise<void> {
