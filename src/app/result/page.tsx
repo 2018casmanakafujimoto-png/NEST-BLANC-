@@ -149,6 +149,11 @@ export default function ResultPage() {
           <br />
           一方で相性の良い「{topMatch.profile.name}」は、その価値観を補い合える関係を築きやすい傾向があります。
         </p>
+        <p className="text-xs text-nb-text/50">
+          参考MBTI（相性の良い男性に近いタイプ）：{topMatch.profile.mbtiReference.join(" / ")}
+          <br />
+          （MBTIは参考表示のみで、診断ロジックには使用していません）
+        </p>
       </section>
 
       {/* --- Section: full compatibility ranking --- */}
@@ -214,9 +219,11 @@ export default function ResultPage() {
           href="https://nest-blanc.com/contact"
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-full bg-nb-accent px-8 py-4 tracking-wide text-white shadow-md transition hover:opacity-90"
+          className="rounded-full bg-nb-accent px-8 py-4 text-center tracking-wide text-white shadow-md transition hover:opacity-90"
         >
-          無料カウンセリングを予約する
+          無料カウンセリングを
+          <br />
+          予約する
         </a>
       </section>
     </main>

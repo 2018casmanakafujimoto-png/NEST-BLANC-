@@ -172,7 +172,7 @@ export const questions: Question[] = [
   {
     id: "q16",
     order: 16,
-    text: "パートナーにはどんな存在でいてほしいですか？",
+    text: "パートナーにはどんな存在で\nいてほしいですか？",
     options: [
       { key: "A", text: "親友のような存在", scores: { communication: 5 } },
       { key: "B", text: "人生のパートナー", scores: { workFamily: 4, communication: 3 } },
@@ -216,7 +216,7 @@ export const questions: Question[] = [
   {
     id: "q20",
     order: 20,
-    text: "二人で大きな決断をする時、あなたはどうしたいですか？",
+    text: "二人で大きな決断をする時、\nあなたはどうしたいですか？",
     options: [
       { key: "A", text: "しっかり話し合って決めたい", scores: { communication: 5, workFamily: 2 } },
       { key: "B", text: "お互いが納得できる方法を探したい", scores: { communication: 4, distance: 3 } },

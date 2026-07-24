@@ -65,6 +65,8 @@ export interface MaleTypeProfile {
   traits: string[];
   /** Representative axis profile, used for radar comparison and similarity math. */
   axisVector: AxisScores;
+  /** Reference-only MBTI display, matching TypeProfile.mbtiReference. Not used in scoring. */
+  mbtiReference: string[];
 }
 
 export interface MaleCompatibilityEntry {

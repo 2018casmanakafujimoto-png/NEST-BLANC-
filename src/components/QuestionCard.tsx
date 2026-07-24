@@ -18,7 +18,7 @@ export function QuestionCard({ question, onAnswer }: QuestionCardProps) {
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="w-full"
     >
-      <h2 className="mb-8 text-center text-lg font-medium leading-relaxed">
+      <h2 className="mb-8 whitespace-pre-line text-center text-lg font-medium leading-relaxed">
         {question.text}
       </h2>
       <div className="flex flex-col gap-3">
